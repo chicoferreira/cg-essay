@@ -56,9 +56,47 @@ cyberpunkdigitalfoundry:
   publisher: Digital Foundry
   url: https://www.youtube.com/watch?v=6bqA8F6B6NQ
 
-
 schlick:
   type: web
   title: Schlick's approximation
   authors: "Christophe Schlick"
   url: https://en.wikipedia.org/wiki/Schlick%27s_approximation
+
+oceansimulationfft:
+  type: article
+  title: Ocean Simulation with FFT and WebGPU
+  authors: "Barthélemy Paleologue"
+  date: 2024-03-20
+  url: https://barthpaleologue.github.io/Blog/posts/ocean-simulation-webgpu
+
+photonshaders:
+  type: artwork
+  title: "Photon Minecraft Shaders"
+  authors: SixthSurge
+  url: https://github.com/sixthsurge/photon
+
+blinnphongspecular:
+  type: article
+  title: Advanced Lighting - Blinn-Phong
+  url: https://learnopengl.com/Advanced-Lighting/Advanced-Lighting
+
+waterbrdf:
+  type: article
+  title: Three Things You Need to Know About WaveWorks 2.0
+  authors: "Nefi Alarcon"
+  publisher: "NVIDIA"
+  urL: https://developer.nvidia.com/blog/three-things-you-need-to-know-about-wave-works-2-0
+
+nvidiacaustics:
+  type: article
+  title: GPU Gems - Chapter 2. Rendering Water Caustics
+  authors: "Juan Guardado"
+  publisher: "NVIDIA"
+  url: https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-2-rendering-water-caustics
+
+raytracingcaustics:
+  type: article
+  title: Generating Ray-Traced Caustic Effects in Unreal Engine 4, Part 2
+  authors: ["Yaobin Ouyang", "Xueqing Yang"]
+  publisher: "NVIDIA"
+  url: https://developer.nvidia.com/blog/generating-ray-traced-caustic-effects-in-unreal-engine-4-part-2/

@@ -130,7 +130,7 @@ For water, environment maps are often used to reflect the sky and distant enviro
   caption: [Cubemap in the scope of the AWP weapon in Counter-Strike 2 @counterstrike2],
 )
 
-This means, for example, characters in Counter-Strike 2 cannot be reflected through the AWP scope (as seen in the image above). Either way, a blurry reflection via a cubemap still adds a lot of realism to the game at virtually no cost. The *performance* of environment maps is also very good, as they are a single texture it's just a texture lookup. The main *draw back* is the lack of accuracy and dynamism.
+This means, for example, characters in Counter-Strike 2 cannot be reflected through the AWP scope (as seen in the image above), and the same will happen with water. Either way, a blurry reflection via a cubemap still adds a lot of realism to the game at virtually no cost. The *performance* of environment maps is also very good, as they are a single texture it's just a texture lookup. The main *draw back* is the lack of accuracy and dynamism.
 
 == Ray Tracing
 
@@ -151,7 +151,9 @@ Despite these optimizations, ray-traced reflections remain a premium feature, ge
 
 == Refraction and Lighting (Transparency, Fresnel, Caustics)
 
-In addition to reflections, water rendering includes *refraction*, the part of seeing into the water. Real water is typically transparent, but it is view-dependant: at shallow angles you mainly see reflection, while looking straight down you see through the underwater terrain. This behavior is governed by the *Fresnel effect*, which engines simulate by blending reflection vs. refraction based on the angle, often using Schlick's approximation. According to the Schlick's model, the specular reflection coefficient $R$ can be approximated by the following equation:
+In addition to reflections, water rendering includes *refraction*, the part of seeing into the water.
+
+Real water is typically transparent, but it is view-dependant: at shallow angles you mainly see reflection, while looking straight down you see through the underwater terrain. This behavior is governed by the *Fresnel effect*, which engines simulate by blending reflection vs. refraction based on the angle, often using Schlick's approximation. According to the Schlick's model, the specular reflection coefficient $R$ can be approximated by the following equation:
 
 $
   R(theta) = R_0 + (1-R_0)(1-cos theta)^5
@@ -160,12 +162,49 @@ $
 where
 
 $
-R_0 = ((n_1 - n_2) / (n_1 + n_2))^2
+  R_0 = ((n_1 - n_2) / (n_1 + n_2))^2
 $
 
 where $theta$ is half the angle between the incoming and outgoing light direction, $n_1$ being the refractive index of the first medium (air, which can be approximated to 1) and $n_2$ the refractive index of the second medium (water), and $R_0$ is the reflection coefficient for light incoming parallel to the normal (when $theta = 0$) @schlick.
 
+So, in practice, the water shader will take the reflection color (from SSR/planar/etc reflections) and blend it with the refraction color (usually by sampling the scene underwater).
 
+The refracted scene color can be obtained by rendering the world from the camera with only the underwater parts (or by a cheap method: copy the color buffer and offset it by the water normal to mimic bending). For instance, one common approach is: render the scene without water to get the "background" image, then when drawing the water, sample that background texture with UVs perturbated by the water surface normal (scaled by the water depth) @oceansimulationfft. This produces a distorcion of the underwater view, approximating true refraction. If done well, you can see the lakebed or objects beneath the surface, distorced by ripples.
+
+#figure(
+  image("imgs/refraction.png"),
+  caption: [Refraction in Photon Minecraft Shaders @photonshaders],
+)
+
+The water also attenuates light, so shaders often fade the refracted color to a deep color (blue/green) with depth, to simulate that light absorption.
+
+Another important light effect is *specular highlights*, the small bright spots that appear on the surface of the water. This can be implemented with a simple approach using the Blinn-Phong model, where the specular highlight is computed as:
+
+$
+  S = max(0, arrow(N) dot arrow(H))^p
+$
+
+where $arrow(N)$ is the surface normal, $arrow(H)$ is the half vector between the view direction and the light direction, and $p$ is the shininess exponent. This value is then multiplied with the light color to get the final specular color. Artists can modify the shininess exponent to control the size and shape of the specular highlight @blinnphongspecular.
+
+A more advanced method can use a BRDF (physically-based material) to calculate specular highlights, allowing for more physically accurate water surfaces @waterbrdf.
+
+*Caustics* also deserve a special mention. These are the focused light pattern os surfaces caused by the water's surface curvature. Caustics can greatly enhance the realism of water rendering. Simulating real caustics is very costly, requiring tracing a giant amount of light rays through the water surface. Instead, games use clever approximations and tricks to simulate them.
+
+A common approach is to simply project an animated texture onto the underwater surfaces that resembles caustic patterns @nvidiacaustics. Although not physically accurate, this can create surprisingly believable results.
+
+#figure(
+  image("imgs/caustics.png"),
+  caption: [Underwater caustics in Minecraft Rethinking Voxels Shader @rethinkingvoxels using a projected texture],
+)
+
+However, using projected textures for caustics often results in visible repeating patterns, which can break immersion if not handled carefully.
+
+With modern ray-tracing hardware, caustics can be generated in real time: each frame, the water's animated surface is rendered from the light's perspective into a "caustics map", rays are traced through it to collect hit data on underwater surfaces, and those contributions accumulate over frames (using temporal blending) into a dynamic buffer that is sampled during the final render, producing accurate, evolving caustic illumination @raytracingcaustics.
+
+#figure(
+  image("imgs/undersea-caustics.png"),
+  caption: [Caustics from NVIDIA's raytracing technique @raytracingcaustics],
+)
 
 = Waves <waves>
 
@@ -183,3 +222,8 @@ where $theta$ is half the angle between the incoming and outgoing light directio
 - https://nejclesek.blogspot.com/2016/05/thousand-ships-with-real-time-buoyancy.html
 
 = Conclusion
+
+- god rays
+- underwater fog
+- volumetric lighting underwater
+- water level of detail
