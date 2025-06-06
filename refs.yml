@@ -1,0 +1,64 @@
+rdr2:
+  type: reference
+  title: Red Dead Redemption 2
+  publisher: Rockstar Games
+  year: 2018
+  url: https://www.rockstargames.com/reddeadredemption2/~
+
+ssr:
+  type: blog
+  title: "Screen Space Reflections : Implementation and optimization - Part 1 : Linear Tracing Method"
+  authors: "Sugu Lee"
+  date: 2021-01-16
+
+rethinkingvoxels:
+  type: artwork
+  title: "Rethinking Voxels (Minecraft Shader)"
+  url: https://modrinth.com/shader/rethinking-voxels
+
+gtav:
+  type: reference
+  title: "Grand Theft Auto V"
+  publisher: Rockstar Games
+  year: 2013
+  url: https://www.rockstargames.com/gta-v
+
+unrealenginescenecapture:
+  type: reference
+  title: "Unreal Engine Scene Capture"
+  authors: "Unreal Engine"
+  url: https://dev.epicgames.com/documentation/en-us/unreal-engine/1.6---scene-capture-cube?application_version=4.27
+
+counterstrike2:
+  type: reference
+  title: "Counter-Strike 2"
+  publisher: Valve
+  year: 2023
+  url: https://www.counter-strike.net/
+
+halflife2:
+  type: reference
+  title: "Half-Life 2"
+  publisher: Valve
+  year: 2004
+  url: https://store.steampowered.com/app/220/HalfLife2/
+
+cyberpunk:
+  type: reference
+  title: "Cyberpunk 2077"
+  publisher: CD Projekt Red
+  year: 2020
+  url: https://www.cyberpunk.net/us/en/
+
+cyberpunkdigitalfoundry:
+  type: video
+  title: "Cyberpunk 2077 PC: What Does Ray Tracing Deliver... And Is It Worth It?"
+  publisher: Digital Foundry
+  url: https://www.youtube.com/watch?v=6bqA8F6B6NQ
+
+
+schlick:
+  type: web
+  title: Schlick's approximation
+  authors: "Christophe Schlick"
+  url: https://en.wikipedia.org/wiki/Schlick%27s_approximation
