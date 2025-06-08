@@ -1,12 +1,12 @@
 rdr2:
-  type: reference
+  type: artwork
   title: Red Dead Redemption 2
   publisher: Rockstar Games
   year: 2018
   url: https://www.rockstargames.com/reddeadredemption2/~
 
 ssr:
-  type: blog
+  type: article
   title: "Screen Space Reflections : Implementation and optimization - Part 1 : Linear Tracing Method"
   authors: "Sugu Lee"
   date: 2021-01-16
@@ -17,7 +17,7 @@ rethinkingvoxels:
   url: https://modrinth.com/shader/rethinking-voxels
 
 gtav:
-  type: reference
+  type: artwork
   title: "Grand Theft Auto V"
   publisher: Rockstar Games
   year: 2013
@@ -30,21 +30,21 @@ unrealenginescenecapture:
   url: https://dev.epicgames.com/documentation/en-us/unreal-engine/1.6---scene-capture-cube?application_version=4.27
 
 counterstrike2:
-  type: reference
+  type: artwork
   title: "Counter-Strike 2"
   publisher: Valve
   year: 2023
   url: https://www.counter-strike.net/
 
 halflife2:
-  type: reference
+  type: artwork
   title: "Half-Life 2"
   publisher: Valve
   year: 2004
   url: https://store.steampowered.com/app/220/HalfLife2/
 
 cyberpunk:
-  type: reference
+  type: artwork
   title: "Cyberpunk 2077"
   publisher: CD Projekt Red
   year: 2020
@@ -57,7 +57,7 @@ cyberpunkdigitalfoundry:
   url: https://www.youtube.com/watch?v=6bqA8F6B6NQ
 
 schlick:
-  type: web
+  type: article
   title: Schlick's approximation
   authors: "Christophe Schlick"
   url: https://en.wikipedia.org/wiki/Schlick%27s_approximation
@@ -88,15 +88,17 @@ waterbrdf:
   urL: https://developer.nvidia.com/blog/three-things-you-need-to-know-about-wave-works-2-0
 
 nvidiawaves:
-  type: article
+  type: chapter
   title: GPU Gems - Chapter 1. Effective Water Simulation for Virtual Water
+  booktitle: "GPU Gems"
   authors: ["Mark Finch", "Cyan Worlds"]
   publisher: "NVIDIA"
   url: https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models
 
 nvidiacaustics:
-  type: article
+  type: chapter
   title: GPU Gems - Chapter 2. Rendering Water Caustics
+  booktitle: "GPU Gems"
   authors: "Juan Guardado"
   publisher: "NVIDIA"
   url: https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-2-rendering-water-caustics
@@ -115,8 +117,9 @@ howgamesfakewater:
   url: https://www.youtube.com/watch?v=PH9q0HNBjT4
 
 fractionalbrownianmotionanddomainwarping:
-  type: article
+  type: chapter
   title: The Book of Shaders - Chapter 13. Fractal Brownian Motion and Domain Warping
+  booktitle: "The Book of Shaders"
   authors: ["Patricio Gonzalez Vivo", "Jen Lowe"]
   url: https://thebookofshaders.com/13/
 
@@ -127,7 +130,7 @@ sumofsineswatershadertoy:
   url: https://www.shadertoy.com/view/MdXyzX
 
 gerstnerwaves:
-  type: web
+  type: article
   title: "3D Ocean Shader Using Gerstner Waves"
   authors: "mujtaba"
   url: https://gameidea.org/2023/12/01/3d-ocean-shader-using-gerstner-waves/
@@ -137,3 +140,60 @@ gerstnerwavessimulation:
   title: "Model-oriented trochoidal waves with vertex shaders"
   authors: "madblade"
   url: https://madblade.github.io/waves-gerstner/
+
+tessendorfffts:
+  type: report
+  title: "Simulating Ocean Water"
+  authors: "Jerry Tessendorf"
+  url: https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf
+
+jumptrajectoryfftvideo:
+  type: video
+  title: "Ocean waves simulation with Fast Fourier transform"
+  authors: "Jump Trajectory"
+  url: https://www.youtube.com/watch?v=kGEqaX4Y4bQ
+
+seaofthieves:
+  type: artwork
+  title: "Sea of Thieves"
+  publisher: "Rare"
+  year: 2018
+  url: https://www.seaofthieves.com/
+
+itriedsimulatingtheentireocean:
+  type: video
+  title: "I Tried Simulating The Entire Ocean"
+  authors: "Acerola"
+  url: https://www.youtube.com/watch?v=yPfagLeUa7k
+
+waterusingflowmaps:
+  type: article
+  title: Animating Water Using Flow Maps
+  authors: Kyle Hayward
+  url: https://graphicsrunner.blogspot.com/2010/08/water-using-flow-maps.html
+
+portal2flowmaps:
+  type: article
+  title: "Manipulating UVs through Color Data in Portal 2"
+  authors: "Bronwen Grimes"
+  publisher: "Valve"
+  url: https://cdn.cloudflare.steamstatic.com/apps/valve/2011/gdc_2011_grimes_nonstandard_textures.pdf
+
+buoyancyfordummies:
+  type: article
+  title: Buoyancy for Dummies
+  authors: Steven Sell
+  url: https://www.vertexfragment.com/ramblings/buoyancy-for-dummies/
+
+waterinteractionmodelforboats:
+  type: article
+  title: Water interaction model for boats in video games
+  authors: Jacques Kerner
+  url: https://www.gamedeveloper.com/programming/water-interaction-model-for-boats-in-video-games
+
+thelastofusp2:
+  type: artwork
+  title: "The Last of Us Part II"
+  publisher: "Naughty Dog"
+  year: 2020
+  url: https://www.playstation.com/en-us/games/the-last-of-us-part-ii/
