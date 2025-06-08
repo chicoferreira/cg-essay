@@ -10,6 +10,7 @@ ssr:
   title: "Screen Space Reflections : Implementation and optimization - Part 1 : Linear Tracing Method"
   authors: "Sugu Lee"
   date: 2021-01-16
+  url: https://sugulee.wordpress.com/2021/01/16/performance-optimizations-for-screen-space-reflections-technique-part-1-linear-tracing-method/
 
 rethinkingvoxels:
   type: artwork

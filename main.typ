@@ -30,7 +30,7 @@
 
 = Introduction
 
-Real-time simulation and rendering of water remain some of the most computationally intensive challenges in computer graphics due to water's complex and dynamic physical properties. Achieving a realistic portrayal traditionally involves particle-based simulations, yet this method is impractical for real-time applications due to computational costs. Consequently, developers must rely on creative approximations and strategic optimizations to simulate water convincingly within strict performance constraints. This paper reviews various sophisticated approaches to water rendering, balancing visual fidelity and computational efficiency, crucial for interactive applications such as video games.
+Real-time simulation and rendering of water remain some of the most challenging tasks in computer graphics due to water's complex and dynamic physical properties. Achieving a realistic portrayal traditionally involves particle-based simulations, yet this method is impractical for real-time applications due to computational costs. Consequently, developers must rely on creative approximations and strategic optimizations to simulate water convincingly within strict performance constraints. This paper reviews various sophisticated approaches to water rendering, balancing visual fidelity and computational efficiency, crucial for interactive applications such as video games.
 
 #figure(
   image("imgs/thelastofusp2mainmenu.png"),
@@ -55,7 +55,7 @@ From this point forward, it is assumed that access to the normals of the water s
 Screen Space Reflection is a widely used real-time technique to approximate reflective surfaces, thus it is a good candidate for water rendering. SSR works by reusing information already on screen: after the scene is rendered, a post-processing pass traces rays in the screen-space depth buffer, trying to find a reflected hit for each pixel of a reflective surface. Basically, it marches a ray from the view, bouncing off the water surface, and intersects against the depth texture to find what on-screen geometry it would reflect.
 
 Implementing SSR is a relatively simple task, as seen in Sugu Lee's blog post @ssr.
-The SSR pass can be executed using a compute shader. Below is the pseudo code #footnote[You can find a Metal shader implementation in the Sugu Lee's blog post @ssr].
+The SSR pass can be executed using a compute shader as a post-processing pass. Below is the pseudo code #footnote[You can find a Metal shader implementation in the Sugu Lee's blog post @ssr].
 
 #import "@preview/lovelace:0.3.0": *
 
@@ -145,7 +145,7 @@ Another lightweight approach is to use environment maps, also called cubemaps, t
   caption: [Cubemap reflecting a window in Counter-Strike 2 @counterstrike2],
 )
 
-For water, environment maps are often used to reflect the sky and distant environment. Many engines include reflection probes that capture the scene from certain points; these can be used for water as well, although for large water surfaces a single static cubemap for the sky is common. The visual realism of environment maps is limited compared to SSR or planar methods as they only capture the world from one point (often not the player's exact position) and cannot reflect dynamic objects unless the cubemap is frequently updated (which would also impact performance).
+For water, environment maps are often used to reflect the sky and distant environment. Many engines include pre-calculated reflection probes that capture the scene from certain points; these can be used for water as well, although for large water surfaces a single static cubemap for the sky is common. The visual realism of environment maps is limited compared to SSR or planar methods as they only capture the world from one point (often not the player's exact position) and cannot reflect dynamic objects unless the cubemap is frequently updated (which would also impact performance).
 
 #figure(
   image("imgs/cs2awpcubemaps.JPG", width: 100%, height: 10%),
@@ -309,7 +309,7 @@ $
   H(x, z, t) = sum_(i=1)^N W_i (x + (partial) / (partial x) W_(i-1), z + (partial) / (partial z) W_(i-1), t)
 $
 
-An additional refinement involves replacing $sin(x)$ with $e^(sin(x) - 1)$ in the wave function. This transformation produces waves with sharper, more pronounced crests and broader, flatter troughs, resulting in a more visually striking and natural appearance. Adjusting the sharpness and width of these features is straightforward: simply scale a constant in the exponent to control the effect.
+Another additional refinement involves replacing $sin(x)$ with $e^(sin(x) - 1)$ in the wave function. This transformation produces waves with sharper, more pronounced crests and broader, flatter troughs, resulting in a more visually striking and natural appearance. Adjusting the sharpness and width of these features is straightforward: simply scale a constant in the exponent to control the effect.
 
 #lq.diagram(
   width: 8cm,
@@ -535,12 +535,12 @@ This paper has discussed various techniques employed for real-time water renderi
 
 While these methods significantly enhance visual realism, the scope of this paper does not exhaustively cover all aspects of realistic water simulation. Missing components that further improve realism but remain topics for future exploration include:
 
-- Underwater god rays, fog and volumetric lighting
-- Dynamic water level-of-detail adjustments
-- Water interactions with dynamic objects
-- Techniques for preventing water rendering inside objects
-- Simulation and rendering of water foam, especially in breaking waves and shorelines
-- Generation and rendering of water spray
+- Underwater god rays, fog and volumetric lighting;
+- Dynamic water level-of-detail adjustments;
+- Water interactions with dynamic objects;
+- Techniques for preventing water rendering inside buoyant objects;
+- Simulation and rendering of water foam, especially in breaking waves and shorelines;
+- Generation and rendering of water spray particles.
 
 Each of these areas offers further avenues for enhancing visual realism and computational efficiency in real-time water rendering.
 
