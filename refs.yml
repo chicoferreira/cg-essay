@@ -87,6 +87,13 @@ waterbrdf:
   publisher: "NVIDIA"
   urL: https://developer.nvidia.com/blog/three-things-you-need-to-know-about-wave-works-2-0
 
+nvidiawaves:
+  type: article
+  title: GPU Gems - Chapter 1. Effective Water Simulation for Virtual Water
+  authors: ["Mark Finch", "Cyan Worlds"]
+  publisher: "NVIDIA"
+  url: https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models
+
 nvidiacaustics:
   type: article
   title: GPU Gems - Chapter 2. Rendering Water Caustics
@@ -100,3 +107,33 @@ raytracingcaustics:
   authors: ["Yaobin Ouyang", "Xueqing Yang"]
   publisher: "NVIDIA"
   url: https://developer.nvidia.com/blog/generating-ray-traced-caustic-effects-in-unreal-engine-4-part-2/
+
+howgamesfakewater:
+  type: video
+  title: "How Games Fake Water"
+  authors: Acerola
+  url: https://www.youtube.com/watch?v=PH9q0HNBjT4
+
+fractionalbrownianmotionanddomainwarping:
+  type: article
+  title: The Book of Shaders - Chapter 13. Fractal Brownian Motion and Domain Warping
+  authors: ["Patricio Gonzalez Vivo", "Jen Lowe"]
+  url: https://thebookofshaders.com/13/
+
+sumofsineswatershadertoy:
+  type: web
+  title: "Very fast procedural ocean - It's fast because it doesn't use noise but rather sin waves"
+  authors: "afl_ext"
+  url: https://www.shadertoy.com/view/MdXyzX
+
+gerstnerwaves:
+  type: web
+  title: "3D Ocean Shader Using Gerstner Waves"
+  authors: "mujtaba"
+  url: https://gameidea.org/2023/12/01/3d-ocean-shader-using-gerstner-waves/
+
+gerstnerwavessimulation:
+  type: web
+  title: "Model-oriented trochoidal waves with vertex shaders"
+  authors: "madblade"
+  url: https://madblade.github.io/waves-gerstner/

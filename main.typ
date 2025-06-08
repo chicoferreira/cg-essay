@@ -15,6 +15,10 @@
   bibliography: bibliography("refs.yml"),
 )
 
+#show image: block.with(clip: true, radius: 5pt)
+
+#text(fill: red)[TODO: remove "we" from the text]
+
 = Introduction
 
 = Water Reflection and Refraction
@@ -208,11 +212,203 @@ With modern ray-tracing hardware, caustics can be generated in real time: each f
 
 = Waves <waves>
 
+#text(
+  fill: red,
+)[Now that we have covered the water shader techniques, we can move on to the water wave simulation techniques.]
+A central task in water rendering is simulating the *waves* that define the surface shape. Water waves can be modeled in various ways depending on the desired realism and performance.
+
+https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models
+
+https://people.computing.clemson.edu/~jtessen/reports/papers_files/coursenotes2004.pdf
+
+
 == Sum of Sines Waves
+
+Realistic water waves are complex, but a simple model that approximates them is to use a sum of sines. This approach levarages the fact that many individual waves (a simple oscillatory function) can be added together to form the overall shape of the water surface.
+
+The simplest approach to create waves is using sine or cosine functions. In a basic implementation, we can use them to approximate a water surface, because the water height at any point oscillates up and down following a sinusoidal pattern. For example, a single wave can be described through time $t$ by a height function:
+
+$
+  W_i (x, z, t) = A_i sin(D_i dot (x, z) times omega_i + t times phi_i)
+$ <sumofsines>
+
+having as parameters:
+- Wavelength ($L$): the distance between two consecutive peaks or troughs, with $omega = 2/L$;
+- Amplitude ($A$): the maximum height of the wave;
+- Speed ($S$): the distance the wave travels in one second, with $phi = S times 2/L$;
+- Direction ($D$): the direction the wave travels, with $D = (D_x, D_z)$ and $A dot B$ being the dot product between $A$ and $B$.
+
+We can then sum all the waves to get the final height function:
+
+$
+  H(x, z, t) = sum_(i=1)^N W_i (x, z, t)
+$
+
+These parameters can be adjusted by the artist to create the desired wave shape. They can also be interpolated over time to create a more dynamic water surface.
+
+This approach done in the GPU (in the vertex shader, for example) is extremely fast (just a sine calculations per vertex) and was common in older games or simple water shaders. Even today, some games still use this approach for small bodies of water or sometimes as a fallback to lower quality settings.
+
+Another consideration is computing the surface _normals_ for the lightning. A naive approach would be to sample two point in the water surface and compute the normal by the cross product. But in this case, we have access to the height function, so we can compute the normal by using partial derivatives of each $x$ and $z$ axis in the height function and do a cross product with them.
+
+As each point in the water surface can be calculated as:
+
+$
+  P(x, z, t) = (x, H(x, z, t), z)
+$
+
+For the $x$-axis (the binormal) we have:
+
+$
+  B(x, z, t) &= ((partial x) / (partial x), (partial) / (partial x) H(x, z, t), (partial z) / (partial x))\
+  &= (1, (partial) / (partial x) H(x, z, t), 0)
+$
+
+Similarly, for the $z$-axis (the tangent) we have:
+
+$
+  T(x, z, t) &= ((partial x) / (partial z), (partial) / (partial z) H(x, z, t), (partial z) / (partial z))\
+  &= (0, (partial) / (partial z) H(x, z, t), 1)
+$
+
+The normal is then computed by the cross product of the binormal and the tangent:
+
+$
+  N(x, z, t) = B(x, z, t) times T(x, z, t)
+$
+
+This equation expansion can be found in the NVIDIA GPU Gems -- Chapter 1 @nvidiawaves. The normal is then normalized to have a length of 1 and used in the lightning calculations.
+
+One problem that can arrive from looking at the formula above, if we keep summing more sines to increase detail, the wave will start to look more like a "spiky" surface instead of a wave.
+
+#figure(
+  image("imgs/sumofwavesspiky.png"),
+  caption: [The result of summing of a lot of sine waves from "How Games Fake Water" video @howgamesfakewater],
+)
+
+To address this issue, the author @howgamesfakewater suggests using Fractal Brownian Motion techniques @fractionalbrownianmotionanddomainwarping, as the formula effectively creates a type of white noise by summing sines with random parameters.
+
+The process begins with amplitude and frequency values set to 1 and a random direction. With each iteration, the amplitude is multiplied by a value less than 1, and the frequency by a value greater than 1, using these updated values to compute the next wave. This approach causes the amplitude to decrease exponentially toward zero, allowing the summation to stop once the amplitude becomes negligible.
+
+The method starts with a large wave and progressively adds smaller, higher-frequency waves with reduced amplitude. The higher frequencies contribute fine detail to the water surface, but their lower amplitude ensures they have less influence on the overall shape, thus avoiding the "spiky" appearance.
+
+An additional enhancement involves applying domain warping @fractionalbrownianmotionanddomainwarping to the formula. During the summation of waves, the sampling position can be shifted by the derivative of the previous wave, creating the effect of waves interacting and pushing against each other.
+
+$
+  H(x, z, t) = sum_(i=1)^N W_i (x + (partial) / (partial x) W_(i-1), z + (partial) / (partial z) W_(i-1), t)
+$
+
+The result can be found in a Shadertoy #link("https://www.shadertoy.com/view/MdXyzX", underline[view]) @sumofsineswatershadertoy which produces a really convincing water surface.
+
+#figure(
+  image("imgs/shadertoysumofsines.png"),
+  caption: [The result of the sum of sines water shader toy @sumofsineswatershadertoy],
+)
 
 == Gerstner Waves
 
+While the sum of sines approach provides a simple and efficient way to approximate water surfaces, it only allows for vertical ($y$-axis) displacement of the vertices. This limitation means that the resulting waves move points up and down, but do not capture the characteristic forward and backward (horizontal) motion of real water waves. As a result, the surface can look artificial, especially when viewed at glancing angles.
+
+Gerstner waves, first described by Franz Josef Gerstner in 1802, offer a more physically accurate model for water waves by introducing horizontal displacement in addition to the vertical movement. In the Gerstner wave model, each point on the water surface is displaced not only in the $y$-direction (height), but also in the $x$ and $z$ directions, following the same underlying sine function. This creates the effect of water particles moving in circular or trochoidal paths, which closely resembles the motion of real ocean waves. @gerstnerwaves
+
+#import "@preview/lilaq:0.3.0" as lq
+
+#lq.diagram(
+  width: 8cm,
+  height: 5cm,
+  xlim: (-4, 16),
+  ylim: (-5, 5),
+  xaxis: none,
+  yaxis: none,
+
+  let x = lq.linspace(-7, 18, num: 70),
+  let fx = x => x + calc.cos(x),
+  let gx = x => calc.sin(x),
+
+  lq.plot(x, x.map(fx), label: $f(x) = x + cos(x)$),
+  lq.plot(x, x.map(gx), label: $g(x) = sin(x)$),
+  lq.plot(x.map(fx), x.map(gx), label: $(f(x), g(x))$),
+)
+
+If we fix a point $x_0$ and add a time component, the motion of a water particle under a Gerstner wave can be visualized as:
+
+$
+  P(t) = (x_0 + cos(x_0 + t), sin(x_0 + t))
+$
+
+#align(
+  center,
+  lq.diagram(
+    width: 8cm,
+    height: 3cm,
+    xlim: (-5, 5),
+    ylim: (-2, 2),
+    xaxis: none,
+    yaxis: none,
+    let x = lq.linspace(-6, 5),
+    let fx = x => x + calc.cos(x),
+    let gx = x => calc.sin(x),
+
+    lq.plot(x.map(fx), x.map(gx), label: $(f(x), g(x))$),
+
+    let t = lq.linspace(-(calc.pi), calc.pi, num: 20),
+    let x0 = 0,
+    lq.plot(
+      t.map(t => x0 + calc.cos(x0 + t)),
+      t.map(t => calc.sin(x0 + t)),
+      label: $P(t)$,
+    ),
+  ),
+)
+
+This illustrates that as time progresses, the point $x_0$ moves along a circular path in the $x y$-plane, as described by $P(t)$. This circular motion is characteristic of Gerstner waves: it causes the wave crests to become sharper and the troughs to appear more rounded, closely resembling the shape of real ocean waves.
+
+Just as we can sum multiple sine waves, we can also generalize Gerstner waves to three dimensions by combining all their components to compute the final vertex position, as described in @nvidiawaves:
+
+$
+  P = vec(
+    x + sum (Q_i A_i  D_i_x cos(omega_i D_i dot (x, z) + phi_i t)),
+    sum (A_i sin(omega_i D_i dot (x, z) + phi_i t)),
+    z + sum (Q_i A_i  D_i_z cos(omega_i D_i dot (x, z) + phi_i t)),
+  )
+$
+
+Here, $Q_i$ controls the steepness of each wave, while the other terms are as defined in @sumofsines.
+
+Calculating the surface for Gerstner waves is more complex than for simple sine waves, but the resulting expression is still differentiable. Computing the surface normal is crucial for realistic lighting and shading, as it determines how light interacts with the water. The process for finding the normal is similar to that used for a sum of sine waves, but now using the Gerstner formulation. Due to the length of the full formula, it is not reproduced here; however, a derivation and final result can be found in @nvidiawaves.
+
+Gerstner wave displacement creates ocean surfaces with waves that move in a clear direction, conveying the sense of wind or water current. Unlike the sum of sine waves, which can appear as random noise, Gerstner waves produce more natural patterns @gerstnerwavessimulation.
+
+Despite their ability to produce more realistic wave shapes, Gerstner waves are less commonly used than the sum of sine waves. This is largely due to the simplicity of the sum of sines (that with Fractal Brownian Motion can produce an approximate wave peak shape), as well as the superior visual quality offered by FFT-based wave approaches.
+
+Another challenge with Gerstner waves is that their parameters must be carefully tuned to avoid unnatural artifacts. Specifically, if the sum $Q_i times omega_i times A_i$ exceeds 1, the $y$ component of the surface normal can become negative at the wave crests. This causes the wave to fold over itself, resulting in visually broken or looping artifacts.
+
+#lq.diagram(
+  width: 8cm,
+  height: 3cm,
+  xlim: (-5, 5),
+  ylim: (-2, 2),
+  xaxis: none,
+  yaxis: none,
+  let x = lq.linspace(-7, 5),
+  let qi = 1.4,
+  let px = x => x + qi * calc.cos(x),
+  let py = x => calc.sin(x),
+
+  lq.plot(x.map(px), x.map(py), label: [$P $ when $Q_i = 1.4$]),
+),
+
+So artists need to be specially careful to not generate parameters that will cause the wave to break.
+
 == Spectral FFT-Based Waves
+
+We can only reduce the repeating pattern of the sum waves by summing more sines. Of course, doing this would be very expensive.
+
+For expansive ocean surfaces, a common approach is to use spectral wave syntesis via the *Fast Fourier Transform (FFT)*, concretely the inverse of it. Using an inverse FFT we can effectively simulate a large number of waves with statistically modeled amplitudes and frequencies, producing a realistic ocean heightfield. Modern GPUs can compute an inverse FFT of a reasonably high-resolution heightfield each frame, enabling detailed ocean simulations.
+
+The technique involves generating a wave spectrum using a statistical model and then computing the inverse FFT of the wave spectrum to get the height of the waves for each point in the water surface.
+
+The wave spectrum
+
 
 = Rendering Rivers (Flow Maps)
 
@@ -223,7 +419,13 @@ With modern ray-tracing hardware, caustics can be generated in real time: each f
 
 = Conclusion
 
-- god rays
-- underwater fog
-- volumetric lighting underwater
-- water level of detail
+#[
+  #set text(fill: red)
+  - god rays
+  - underwater fog
+  - volumetric lighting underwater
+  - water level of detail
+  - water interaction
+  - water displacement to not render inside objects
+  - water foam
+]
